@@ -37,7 +37,21 @@ const accountSlice = createSlice({
     }
 })
 
-export const {deposit,withdraw,requestLoan,payLoan} = accountSlice.actions
+export function deposit(amount, currency){
+    if(currency==='USD') return {type: "account/deposit", payload: amount}
+    // thunk middleware
+    return async function(dispatch, getState){
+        const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`)
+        const data = await res.json()
+        const converted = data.rates.USD
+        dispatch({
+            type: "account/deposit",
+            payload: converted
+        })
+    }
+}
+
+export const {withdraw,requestLoan,payLoan} = accountSlice.actions
 export default accountSlice.reducer
 
 
